@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:5.0.2
+    env_file: ./.env
+    # "no" :- it is the default value, and it will never restart the container.
+    # on-failure :- it will restart the container whenever it encounters an error, or say, whenever the process running inside the container exit with non-zero exit code. Exit code :- 0 means no error, we terminated the process intentionally, but any non-zero value is an error.
+    # always :- as the name, it will always restart the container, no matter whatever be the exit code is. Also, it will restart the container even when we manually stopped it but for that we need to restart the docker daemon.
+    # unless-stopped :- it is similar to the always flag the only difference is once the container is stopped manually it will not restart automatically even after restarting the docker daemon, until we start the container manually again.
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+    ports:
+      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+    volumes:
+      - db:/data/db
+
+  # nodejs:
+  #   image: 
+  
+  app:
+    depends_on:
+      - mongodb
+    build: ./
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - DB_HOST=mongodb
+      - DB_USER=$MONGODB_USER
+      - DB_PASSWORD=$MONGODB_PASSWORD
+      - DB_NAME=$MONGODB_DATABASE
+      - DB_PORT=$MONGODB_DOCKER_PORT
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
