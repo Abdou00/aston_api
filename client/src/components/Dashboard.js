@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TimezoneSelect from "react-timezone-select";
 import { useNavigate } from "react-router-dom";
-import { time } from "../utils/ressource";
+import { handleCreateSchedule, time } from "../utils/ressource";
 import { toast } from "react-toastify";
 
 const Dashboard = () => {
@@ -17,6 +17,10 @@ const Dashboard = () => {
     {day: "Sat", startTime: "", endTime: ""},
   ]);
 
+  useEffect(() => {
+    if (!localStorage.getItem('_id')) navigate('/')
+  }, [navigate]);
+
   // Màj du tableau des horaires de début et de fin
   const handleTimeChange = (e, id) => {
     const { name, value } = e.target;
@@ -31,8 +35,12 @@ const Dashboard = () => {
   }
 
   const handleSaveSchedules = () => {
-    if (JSON.stringify(selectedTimezone) !== "{}") console.log(schedule);
-    else toast.error("Select your timezone")
+    if (JSON.stringify(selectedTimezone) !== "{}") {
+      console.log(schedule);
+      handleCreateSchedule(selectedTimezone, schedule, navigate);
+    } else {
+      toast.error("Select your timezone");
+    }
   };
 
   // Purge le local storage à la déconnexion
