@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { handleRegister } from "../utils/ressource";
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -8,9 +9,10 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    if (username.trim() && password.trim() && email.trim()) {
-      e.preventDefault();
+    e.preventDefault();
 
+    if (username.trim() && password.trim() && email.trim()) {
+      handleRegister(email, username, password, navigate);
       console.log({email, username, password});
       setEmail('');
       setUsername('');
